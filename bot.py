@@ -8,13 +8,19 @@ import json
 app = Flask(__name__)
 bot = Bot(token=os.getenv("TELEGRAM_BOT_TOKEN"))
 
-firebase_key = os.getenv("FIREBASE_KEY")
-firebase_cred = json.loads(firebase_key)
+# Load Firebase credentials from the environment variable
+firebase_key = os.getenv("FIREBASE_KEY")  # Ensure this environment variable is set
+if not firebase_key:
+    raise ValueError("FIREBASE_KEY environment variable is not set")
+    
+firebase_cred = json.loads(firebase_key)  # Parse the JSON string into a dictionary
 
-# Initialize Firebase
-ccred = credentials.Certificate(firebase_cred)
+# Initialize Firebase credentials
+cred = credentials.Certificate(firebase_cred)
+
+# Initialize Firebase App
 initialize_app(cred, {
-    "databaseURL": "https://tg-bot-ba554.firebaseio.com/"
+    "databaseURL": "https://tg-bot-ba554.firebaseio.com/"  # Replace with your Firebase Realtime Database URL
 })
 
 # Reference to the "leave_requests" node in the database
