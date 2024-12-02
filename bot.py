@@ -6,6 +6,10 @@ import firebase_admin
 from firebase_admin import credentials, db, initialize_app
 import json
 
+
+
+app = FastAPI()
+
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
@@ -15,7 +19,6 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
-app = FastAPI()
 
 # Initialize the Telegram Bot
 token = os.getenv("TELEGRAM_BOT_TOKEN")
