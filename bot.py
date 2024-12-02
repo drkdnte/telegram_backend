@@ -2,7 +2,8 @@ from flask import Flask, request, jsonify
 from telegram import Bot, Update
 import os
 import firebase_admin
-from firebase_admin import credentials, db
+from firebase_admin import credentials, db, initialize_app
+import json
 
 app = Flask(__name__)
 bot = Bot(token=os.getenv("TELEGRAM_BOT_TOKEN"))
