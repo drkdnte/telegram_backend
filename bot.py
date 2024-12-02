@@ -35,7 +35,7 @@ leave_requests_ref = db.reference("leave_requests")
 async def home():
     return {"message": "Telegram Bot is running with Firebase!"}
 
-@app.post("/webhook")
+@app.post("/webhook")  # Ensure this is the correct path
 async def webhook(request: Request):
     update = Update.de_json(await request.json(), bot)  # Await the JSON request
     chat_id = update.message.chat.id
