@@ -41,7 +41,7 @@ initialize_app(cred, {
 # Reference to the "leave_requests" node in the database
 leave_requests_ref = db.reference("leave_requests")
 
-# Dictionary to hold user data
+# Dictionary to hold user data and their current state
 user_data = {}
 
 @app.get("/")
@@ -64,31 +64,39 @@ async def webhook(request: Request):
                    "/viewleaves - View submitted leave requests"
     elif message_text.lower() == "/addleave":
         # Start the leave request process
-        user_data[chat_id] = {}  # Initialize user data
+        user_data[chat_id] = {"step": "leaveId"}  # Initialize user data with the first step
         await ask_leave_id(chat_id)  # Ask for Leave ID
         return {"status": "ok"}
 
     elif chat_id in user_data:
+        step = user_data[chat_id]["step"]  # Get current step
+
         # Handle user input based on expected fields
-        if "leaveId" not in user_data[chat_id]:
+        if step == "leaveId":
             user_data[chat_id]["leaveId"] = message_text.strip('"')
+            user_data[chat_id]["step"] = "visitPlace"
             await ask_visit_place(chat_id)  # Ask for Visit Place
-        elif "visitPlace" not in user_data[chat_id]:
+        elif step == "visitPlace":
             user_data[chat_id]["visitPlace"] = message_text.strip('"')
+            user_data[chat_id]["step"] = "reason"
             await ask_reason(chat_id)  # Ask for Reason
-        elif "reason" not in user_data[chat_id]:
+        elif step == "reason":
             user_data[chat_id]["reason"] = message_text.strip('"')
+            user_data[chat_id]["step"] = "leaveType"
             await ask_leave_type(chat_id)  # Ask for Leave Type
-        elif "leaveType" not in user_data[chat_id]:
+        elif step == "leaveType":
             user_data[chat_id]["leaveType"] = message_text.strip('"')
+            user_data[chat_id]["step"] = "fromDate"
             await ask_from_date(chat_id)  # Ask for From Date
-        elif "fromDate" not in user_data[chat_id]:
+        elif step == "fromDate":
             user_data[chat_id]["fromDate"] = message_text.strip('"')
+            user_data[chat_id]["step"] = "toDate"
             await ask_to_date(chat_id)  # Ask for To Date
-        elif "toDate" not in user_data[chat_id]:
+        elif step == "toDate":
             user_data[chat_id]["toDate"] = message_text.strip('"')
+            user_data[chat_id]["step"] = "remark"
             await ask_remark(chat_id)  # Ask for Remark
-        elif "remark" not in user_data[chat_id]:
+        elif step == "remark":
             user_data[chat_id]["remark"] = message_text.strip('"')
             await confirm_leave_request(chat_id)  # Confirm the request
 
