@@ -6,8 +6,6 @@ import firebase_admin
 from firebase_admin import credentials, db, initialize_app
 import json
 
-
-
 app = FastAPI()
 
 # Add CORS middleware
@@ -18,7 +16,6 @@ app.add_middleware(
     allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
     allow_headers=["*"],  # Allow all headers
 )
-
 
 # Initialize the Telegram Bot
 token = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -63,25 +60,37 @@ async def webhook(request: Request):
                    "/addleave - Add a leave request\n" \
                    "/viewleaves - View submitted leave requests"
     elif message_text.lower().startswith("/addleave"):
-        parts = message_text.split(maxsplit=5)
-        if len(parts) == 6:
+        parts = message_text.split(maxsplit=8)  # Allow for 8 additional parameters
+        if len(parts) == 9:  # Expecting 9 parts (1 command + 8 parameters)
             leave_request = {
                 "leaveId": parts[1],
                 "visitPlace": parts[2],
                 "reason": parts[3],
-                "fromDate": parts[4],
-                "toDate": parts[5]
+                "leaveType": parts[4],
+                "fromDate": parts[5],
+                "toDate": parts[6],
+                "status": parts[7],  # Accept status from user input
+                "remark": parts[8]   # Accept remark from user input
             }
             leave_requests_ref.push(leave_request)
             response = f"Leave request submitted!\nLeave ID: {leave_request['leaveId']}"
         else:
-            response = "Usage: /addleave <LeaveID> <VisitPlace> <Reason> <FromDate> <ToDate>"
+            response = "Usage: /addleave <LeaveID> <VisitPlace> <Reason> <LeaveType> <FromDate> <ToDate> <Status> <Remark>"
     elif message_text.lower() == "/viewleaves":
         leave_requests = leave_requests_ref.get()
         if leave_requests:
             response = "Here are your leave requests:\n"
             for i, (key, leave) in enumerate(leave_requests.items(), start=1):
-                response += f"{i}. Leave ID: {leave['leaveId']} | Visit Place: {leave['visitPlace']} | From: {leave['fromDate']} | To: {leave['toDate']}\n"
+                response += (
+                    f"{i}. Leave ID: {leave['leaveId']} | "
+                    f"Visit Place: {leave['visitPlace']} | "
+                    f"Reason: {leave['reason']} | "
+                    f"Leave Type: {leave['leaveType']} | "
+                    f"From: {leave['fromDate']} | "
+                    f"To: {leave['toDate']} | "
+                    f"Status: {leave['status']} | "
+                    f"Remark: {leave['remark']}\n"
+                )
         else:
             response = "No leave requests found."
     else:
