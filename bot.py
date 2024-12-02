@@ -75,14 +75,14 @@ async def webhook(request: Request):
                 "leaveId": inputs[0].strip(),  # Leave ID
                 "visitPlace": inputs[1].strip(),  # Visit Place
                 "reason": inputs[2].strip(),  # Reason
-                "leaveType": inputs[3].strip(),  # Leave Type
-                "fromDate": inputs[4].strip(),  # From DateTime
-                "toDate": inputs[5].strip(),  # To DateTime
+                "leaveType": inputs[3].strip().upper(),  # Leave Type
+                "fromDate": inputs[4].strip().upper(),  # From DateTime
+                "toDate": inputs[5].strip().upper(),  # To DateTime
                 "status": "REQUEST CANCELLED BEFORE APPROVAL",  # Automatically set status to "Pending"
                 "remark": ""  # Automatically set remark to an empty string
             }
             leave_requests_ref.push(leave_request)
-            response = f"Leave request submitted!\nLeave ID: {leave_request['leaveId']}"
+            response = f"Leave request submitted!\nLeave ID: {leave_request['leaveId']}\nVisit Place: {leave_request['visitPlace']}\nReason: {leave_request['reason']}\nLeave Type: {leave_request['leaveType']}\nFrom Date:  {leave_request['fromDate']}\nTo Date: {leave_request['toDate']}\nStatus: {leave_request['status']}\nRemark: {leave_request['remark']}"
         else:
             response = "Usage: /addleave <LeaveID>, <VisitPlace>, <Reason>, <LeaveType>, <FromDateTime>, <ToDateTime>"
     elif message_text.lower() == "/viewleaves":
