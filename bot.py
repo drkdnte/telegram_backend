@@ -62,34 +62,36 @@ async def webhook(request: Request):
     elif message_text.lower().startswith("/addleave"):
         # Get everything after the command as a single input
         command_parts = message_text.split(maxsplit=1)
-        
+
         if len(command_parts) < 2:
             response = "Usage: /addleave <LeaveID> <VisitPlace> <Reason> <LeaveType> <FromDateTime> <ToDateTime>"
             await bot.send_message(chat_id=chat_id, text=response)
             return {"status": "ok"}
         
-        # Split the input values by comma or another delimiter if necessary
+        # Split the input values by comma
         inputs = command_parts[1].split(",")  # Adjust this to whatever delimiter you choose
         if len(inputs) == 6:  # We expect 6 inputs
             leave_request = {
                 "leaveId": inputs[0].strip(),  # Leave ID
                 "visitPlace": inputs[1].strip(),  # Visit Place
                 "reason": inputs[2].strip(),  # Reason
-                "leaveType": inputs[3].strip().upper(),  # Leave Type
-                "fromDate": inputs[4].strip().upper(),  # From DateTime
-                "toDate": inputs[5].strip().upper(),  # To DateTime
-                "status": "REQUEST APPROVED",  # Automatically set status to "Pending"
-                "remark": "Approved by [ 100254 ] [ KANNAN S ]"  # Automatically set remark to an empty string
+                "leaveType": inputs[3].strip().upper(),  # Leave Type (converted to uppercase)
+                "fromDate": inputs[4].strip().upper(),  # From DateTime (converted to uppercase)
+                "toDate": inputs[5].strip().upper(),  # To DateTime (converted to uppercase)
+                "status": "Pending",  # Automatically set status to "Pending"
+                "remark": ""  # Automatically set remark to an empty string
             }
             leave_requests_ref.push(leave_request)
-            response = f"Leave request submitted!\nLeave ID: {leave_request['leaveId']}\nVisit Place: {leave_request['visitPlace']}\nReason: {leave_request['reason']}\nLeave Type: {leave_request['leaveType']}\nFrom Date:  {leave_request['fromDate']}\nTo Date: {leave_request['toDate']}\nStatus: {leave_request['status']}\nRemark: {leave_request['remark']}"
+            response = f"Leave request submitted!\nLeave ID: {leave_request['leaveId']}"
         else:
             response = "Usage: /addleave <LeaveID>, <VisitPlace>, <Reason>, <LeaveType>, <FromDateTime>, <ToDateTime>"
     elif message_text.lower() == "/viewleaves":
         leave_requests = leave_requests_ref.get()
         if leave_requests:
-            response = "Here are your leave requests:\n"
-            for i, (key, leave) in enumerate(leave_requests.items(), start=1):
+            # Reverse the order of leave requests
+            reversed_requests = list(leave_requests.items())[::-1]
+            response = "Here are your leave requests (most recent first):\n"
+            for i, (key, leave) in enumerate(reversed_requests, start=1):
                 response += f"{i}. Leave ID: {leave['leaveId']} | Visit Place: {leave['visitPlace']} | From: {leave['fromDate']} | To: {leave['toDate']} | Status: {leave['status']} | Remark: {leave['remark']}\n"
         else:
             response = "No leave requests found."
@@ -103,7 +105,9 @@ async def webhook(request: Request):
 async def get_leave_requests():
     leave_requests = leave_requests_ref.get()
     if leave_requests:
-        return [leave for leave in leave_requests.values()]
+        # Reverse the order of leave requests
+        reversed_requests = list(leave_requests.items())[::-1]
+        return [leave for _, leave in reversed_requests]  # Return the reversed leave requests
     return []  # Return an empty list if no requests are found
 
 if __name__ == "__main__":
