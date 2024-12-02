@@ -6,8 +6,9 @@ from firebase_admin import credentials, db, initialize_app
 import json
 
 app = Flask(__name__)
-bot = Bot(token=os.getenv("TELEGRAM_BOT_TOKEN"))
-
+token = os.getenv("TELEGRAM_BOT_TOKEN")
+bot = Bot(token)
+print(bot.get_me())
 # Load Firebase credentials from the environment variable
 firebase_key = os.getenv("FIREBASE_KEY")  # Ensure this environment variable is set
 if not firebase_key:
