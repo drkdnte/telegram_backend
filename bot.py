@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from telegram import Bot, Update
 import os
 import firebase_admin
-from firebase_admin import credentials, db
+from firebase_admin import credentials, db, initialize_app
 import json
 
 app = FastAPI()
