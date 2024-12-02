@@ -78,8 +78,8 @@ async def webhook(request: Request):
                 "leaveType": inputs[3].strip().upper(),  # Leave Type
                 "fromDate": inputs[4].strip().upper(),  # From DateTime
                 "toDate": inputs[5].strip().upper(),  # To DateTime
-                "status": "REQUEST CANCELLED BEFORE APPROVAL",  # Automatically set status to "Pending"
-                "remark": ""  # Automatically set remark to an empty string
+                "status": "REQUEST APPROVED",  # Automatically set status to "Pending"
+                "remark": "Approved by [ 100254 ] [ KANNAN S ]"  # Automatically set remark to an empty string
             }
             leave_requests_ref.push(leave_request)
             response = f"Leave request submitted!\nLeave ID: {leave_request['leaveId']}\nVisit Place: {leave_request['visitPlace']}\nReason: {leave_request['reason']}\nLeave Type: {leave_request['leaveType']}\nFrom Date:  {leave_request['fromDate']}\nTo Date: {leave_request['toDate']}\nStatus: {leave_request['status']}\nRemark: {leave_request['remark']}"
