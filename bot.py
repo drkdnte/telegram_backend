@@ -25,7 +25,7 @@ cred = credentials.Certificate(firebase_cred)
 
 # Initialize Firebase App
 initialize_app(cred, {
-    "databaseURL": "https://tg-bot-5241b.firebaseio.com/"  # Update to your new database URL
+    "databaseURL": "https://tg-bot-5241b-default-rtdb.firebaseio.com/"  # Update to your new database URL
 })
 
 # Reference to the "leave_requests" node in the database
