@@ -41,9 +41,6 @@ initialize_app(cred, {
 # Reference to the "leave_requests" node in the database
 leave_requests_ref = db.reference("leave_requests")
 
-# Dictionary to hold user data and their current state
-user_data = {}
-
 @app.get("/")
 async def home():
     return {"message": "Telegram Bot is running with Firebase!"}
@@ -62,94 +59,45 @@ async def webhook(request: Request):
                    "/start - Start the bot\n" \
                    "/addleave - Add a leave request\n" \
                    "/viewleaves - View submitted leave requests"
-    elif message_text.lower() == "/addleave":
-        # Start the leave request process
-        user_data[chat_id] = {"step": "leaveId"}  # Initialize user data with the first step
-        await ask_leave_id(chat_id)  # Ask for Leave ID
-        return {"status": "ok"}
-
-    elif chat_id in user_data:
-        step = user_data[chat_id]["step"]  # Get current step
-
-        # Handle user input based on expected fields
-        if step == "leaveId":
-            user_data[chat_id]["leaveId"] = message_text.strip('"')
-            user_data[chat_id]["step"] = "visitPlace"
-            await ask_visit_place(chat_id)  # Ask for Visit Place
-        elif step == "visitPlace":
-            user_data[chat_id]["visitPlace"] = message_text.strip('"')
-            user_data[chat_id]["step"] = "reason"
-            await ask_reason(chat_id)  # Ask for Reason
-        elif step == "reason":
-            user_data[chat_id]["reason"] = message_text.strip('"')
-            user_data[chat_id]["step"] = "leaveType"
-            await ask_leave_type(chat_id)  # Ask for Leave Type
-        elif step == "leaveType":
-            user_data[chat_id]["leaveType"] = message_text.strip('"')
-            user_data[chat_id]["step"] = "fromDate"
-            await ask_from_date(chat_id)  # Ask for From Date
-        elif step == "fromDate":
-            user_data[chat_id]["fromDate"] = message_text.strip('"')
-            user_data[chat_id]["step"] = "toDate"
-            await ask_to_date(chat_id)  # Ask for To Date
-        elif step == "toDate":
-            user_data[chat_id]["toDate"] = message_text.strip('"')
-            user_data[chat_id]["step"] = "remark"
-            await ask_remark(chat_id)  # Ask for Remark
-        elif step == "remark":
-            user_data[chat_id]["remark"] = message_text.strip('"')
-            await confirm_leave_request(chat_id)  # Confirm the request
-
+    elif message_text.lower().startswith("/addleave"):
+        # Get everything after the command as a single input
+        command_parts = message_text.split(maxsplit=1)
+        
+        if len(command_parts) < 2:
+            response = "Usage: /addleave <LeaveID> <VisitPlace> <Reason> <LeaveType> <FromDateTime> <ToDateTime>"
+            await bot.send_message(chat_id=chat_id, text=response)
+            return {"status": "ok"}
+        
+        # Split the input values by comma or another delimiter if necessary
+        inputs = command_parts[1].split(",")  # Adjust this to whatever delimiter you choose
+        if len(inputs) == 6:  # We expect 6 inputs
+            leave_request = {
+                "leaveId": inputs[0].strip(),  # Leave ID
+                "visitPlace": inputs[1].strip(),  # Visit Place
+                "reason": inputs[2].strip(),  # Reason
+                "leaveType": inputs[3].strip(),  # Leave Type
+                "fromDate": inputs[4].strip(),  # From DateTime
+                "toDate": inputs[5].strip(),  # To DateTime
+                "status": "Pending",  # Automatically set status to "Pending"
+                "remark": ""  # Automatically set remark to an empty string
+            }
+            leave_requests_ref.push(leave_request)
+            response = f"Leave request submitted!\nLeave ID: {leave_request['leaveId']}"
+        else:
+            response = "Usage: /addleave <LeaveID>, <VisitPlace>, <Reason>, <LeaveType>, <FromDateTime>, <ToDateTime>"
+    elif message_text.lower() == "/viewleaves":
+        leave_requests = leave_requests_ref.get()
+        if leave_requests:
+            response = "Here are your leave requests:\n"
+            for i, (key, leave) in enumerate(leave_requests.items(), start=1):
+                response += f"{i}. Leave ID: {leave['leaveId']} | Visit Place: {leave['visitPlace']} | From: {leave['fromDate']} | To: {leave['toDate']} | Status: {leave['status']} | Remark: {leave['remark']}\n"
+        else:
+            response = "No leave requests found."
     else:
         response = "I didn't understand that. Use /help to see available commands."
 
     await bot.send_message(chat_id=chat_id, text=response)  # Await the send_message coroutine
     return {"status": "ok"}
-
-# Function to ask for Leave ID
-async def ask_leave_id(chat_id):
-    await bot.send_message(chat_id, "Please enter your Leave ID:")
-
-# Function to ask for Visit Place
-async def ask_visit_place(chat_id):
-    await bot.send_message(chat_id, "Please enter the Visit Place:")
-
-# Function to ask for Reason
-async def ask_reason(chat_id):
-    await bot.send_message(chat_id, "Please enter the Reason:")
-
-# Function to ask for Leave Type
-async def ask_leave_type(chat_id):
-    await bot.send_message(chat_id, "Please enter the Leave Type:")
-
-# Function to ask for From Date
-async def ask_from_date(chat_id):
-    await bot.send_message(chat_id, "Please enter the From Date and Time (e.g., 01-DEC-2024 06:30 AM):")
-
-# Function to ask for To Date
-async def ask_to_date(chat_id):
-    await bot.send_message(chat_id, "Please enter the To Date and Time (e.g., 02-DEC-2024 09:00 PM):")
-
-# Function to ask for Remark
-async def ask_remark(chat_id):
-    await bot.send_message(chat_id, "Please enter any remarks (leave blank if none):")
-
-# Function to confirm leave request
-async def confirm_leave_request(chat_id):
-    leave_request = user_data[chat_id]
-    response = (
-        f"Please confirm your leave request:\n"
-        f"Leave ID: {leave_request['leaveId']}\n"
-        f"Visit Place: {leave_request['visitPlace']}\n"
-        f"Reason: {leave_request['reason']}\n"
-        f"Leave Type: {leave_request['leaveType']}\n"
-        f"From: {leave_request['fromDate']}\n"
-        f"To: {leave_request['toDate']}\n"
-        f"Remark: {leave_request['remark']}\n"
-        f"Status: Pending\n"  # Explicitly include status
-        "Is this correct? (yes/no)"
-    )
-    await bot.send_message(chat_id, response)
 
 @app.get("/leave-requests")
 async def get_leave_requests():
