@@ -1,51 +1,60 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from telegram import Bot, Update
 import os
+import json
 
-# Initialize Flask app
 app = Flask(__name__)
-
-# Initialize Telegram bot using token from environment variables
 bot = Bot(token=os.getenv("TELEGRAM_BOT_TOKEN"))
 
-# Root route for health check
+LEAVE_REQUESTS_FILE = 'leave_requests.json'
+
+def load_leave_requests():
+    try:
+        with open(LEAVE_REQUESTS_FILE, 'r') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return []
+
+def save_leave_requests(leave_requests):
+    with open(LEAVE_REQUESTS_FILE, 'w') as file:
+        json.dump(leave_requests, file)
+
+leave_requests = load_leave_requests()
+
 @app.route('/')
 def home():
     return "Telegram Bot is running!"
 
-# Webhook route to handle Telegram updates
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    # Parse incoming Telegram update
     update = Update.de_json(request.get_json(force=True), bot)
-    
-    # Get the chat ID and message text
     chat_id = update.message.chat.id
     message_text = update.message.text
-    
-    # Example response logic
-    if message_text.lower() == "/start":
-        response = "Welcome to the Leave Management Bot! Use /addleave to submit a leave request."
-    elif message_text.lower().startswith("/addleave"):
-        # Extract leave details from the message
+
+    if message_text.lower().startswith("/addleave"):
         parts = message_text.split(maxsplit=5)
-        if len(parts) >= 5:
-            leave_id, visit_place, reason, from_date, to_date = parts[1:]
-            response = (f"Leave request received!\n"
-                        f"Leave ID: {leave_id}\n"
-                        f"Visit Place: {visit_place}\n"
-                        f"Reason: {reason}\n"
-                        f"From: {from_date}\n"
-                        f"To: {to_date}")
+        if len(parts) >= 6:
+            leave_request = {
+                "leaveId": parts[1],
+                "visitPlace": parts[2],
+                "reason": parts[3],
+                "fromDate": parts[4],
+                "toDate": parts[5]
+            }
+            leave_requests.append(leave_request)
+            save_leave_requests(leave_requests)
+            response = f"Leave request submitted!\nLeave ID: {leave_request['leaveId']}"
         else:
             response = "Usage: /addleave <LeaveID> <VisitPlace> <Reason> <FromDate> <ToDate>"
     else:
-        response = "I didn't understand that. Try /start or /addleave."
+        response = "I didn't understand that. Try /addleave."
 
-    # Send response back to the user
     bot.send_message(chat_id=chat_id, text=response)
     return "OK"
 
-# Run the app
+@app.route('/leave-requests', methods=['GET'])
+def get_leave_requests():
+    return jsonify(leave_requests)
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
