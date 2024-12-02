@@ -60,8 +60,8 @@ async def webhook(request: Request):
                    "/addleave - Add a leave request\n" \
                    "/viewleaves - View submitted leave requests"
     elif message_text.lower().startswith("/addleave"):
-        parts = message_text.split(maxsplit=5)
-        if len(parts) == 6:
+        parts = message_text.split(maxsplit=6)
+        if len(parts) == 7:
             leave_request = {
                 "leaveId": parts[1],
                 "visitPlace": parts[2],
