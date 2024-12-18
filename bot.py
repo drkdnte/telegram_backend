@@ -159,12 +159,12 @@ async def webhook(request: Request):
             for i, (key, leave) in enumerate(reversed_requests, start=1):
                 response += (
                     f"*Leave Request {i}*:\n"
-                    f"• **Leave ID**: {leave['leaveId']}\n"
-                    f"• **Visit Place**: {leave['visitPlace']}\n"
-                    f"• **From**: {leave['fromDate']}\n"
-                    f"• **To**: {leave['toDate']}\n"
-                    f"• **Status**: {leave['status']}\n"
-                    f"• **Remark**: {leave['remark']}\n"
+                    f"• Leave ID: {leave['leaveId']}\n"
+                    f"• Visit Place: {leave['visitPlace']}\n"
+                    f"• From: {leave['fromDate']}\n"
+                    f"• To: {leave['toDate']}\n"
+                    f"• Status: {leave['status']}\n"
+                    f"• Remark: {leave['remark']}\n"
                     f"--------------------------\n"
                 )
         else:
