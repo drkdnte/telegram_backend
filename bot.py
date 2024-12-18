@@ -128,7 +128,7 @@ async def webhook(request: Request):
         for repo in repositories:
             try:
                 # Perform the GitHub Pages publish logic
-                url = f"https://api.github.com/repos/{github_username}/{repo}/pages"
+                url = f"https://api.github.com/repos/{REPO_OWNER}/{repo}/pages"
                 headers = {
                     "Authorization": f"Bearer {github_token}",
                     "Accept": "application/vnd.github.v3+json"
@@ -150,7 +150,7 @@ async def webhook(request: Request):
         for repo in repositories:
             try:
                 # Perform the GitHub Pages unpublish logic
-                url = f"https://api.github.com/repos/{github_username}/{repo}/pages"
+                url = f"https://api.github.com/repos/{REPO_OWNER}/{repo}/pages"
                 headers = {
                     "Authorization": f"Bearer {github_token}",
                     "Accept": "application/vnd.github.v3+json"
