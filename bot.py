@@ -150,25 +150,25 @@ async def webhook(request: Request):
         else:
             response = "Usage: /addleave <LeaveID>, <VisitPlace>, <Reason>, <LeaveType>, <FromDateTime>, <ToDateTime>"
     elif message_text.lower() == "/viewleaves":
-    leave_requests = leave_requests_ref.get()
-    if leave_requests:
-        # Reverse the order of leave requests
-        reversed_requests = list(leave_requests.items())[::-1]
-        response = "Here are your leave requests (most recent first):\n\n"
-        
-        for i, (key, leave) in enumerate(reversed_requests, start=1):
-            response += (
-                f"*Leave Request {i}*:\n"
-                f"• **Leave ID**: {leave['leaveId']}\n"
-                f"• **Visit Place**: {leave['visitPlace']}\n"
-                f"• **From**: {leave['fromDate']}\n"
-                f"• **To**: {leave['toDate']}\n"
-                f"• **Status**: {leave['status']}\n"
-                f"• **Remark**: {leave['remark']}\n"
-                f"--------------------------\n"
-            )
-    else:
-        response = "No leave requests found."
+        leave_requests = leave_requests_ref.get()
+        if leave_requests:
+            # Reverse the order of leave requests
+            reversed_requests = list(leave_requests.items())[::-1]
+            response = "Here are your leave requests (most recent first):\n\n"
+            
+            for i, (key, leave) in enumerate(reversed_requests, start=1):
+                response += (
+                    f"*Leave Request {i}*:\n"
+                    f"• **Leave ID**: {leave['leaveId']}\n"
+                    f"• **Visit Place**: {leave['visitPlace']}\n"
+                    f"• **From**: {leave['fromDate']}\n"
+                    f"• **To**: {leave['toDate']}\n"
+                    f"• **Status**: {leave['status']}\n"
+                    f"• **Remark**: {leave['remark']}\n"
+                    f"--------------------------\n"
+                )
+        else:
+            response = "No leave requests found."
 
     else:
         response = "I didn't understand that. Use /help to see available commands."
