@@ -19,7 +19,7 @@ app.add_middleware(
 )
 
 # GitHub configuration
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")  # Set your GitHub PAT as an environment variable
+github_token = os.getenv("GITHUB_TOKEN")  # Set your GitHub PAT as an environment variable
 REPO_OWNER = "drkdnte"  # Replace with your GitHub username
 # List of repositories to manage
 repositories = [
