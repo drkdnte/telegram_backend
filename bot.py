@@ -122,8 +122,8 @@ async def webhook(request: Request):
         response = "Here are the available commands:\n" \
                    "/start - Start the bot\n" \
                    "/addleave - Add a leave request\n" \
-                   "/viewleaves - View submitted leave requests" \
-                   "/publish - Publish the site" \
+                   "/viewleaves - View submitted leave requests\n" \
+                   "/publish - Publish the site\n" \
                    "/unpublish - unpublish the site"
     elif message_text.lower().startswith("/addleave"):
         # Get everything after the command as a single input
