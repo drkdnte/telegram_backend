@@ -123,44 +123,44 @@ async def webhook(request: Request):
     if message_text.lower() == "/start":
         response = "Welcome to the Leave Management Bot! Use /help to see all available commands."
     elif message_text.lower() == "/publish":
-    results = []
-    for repo in repositories:
-        try:
-            # Perform the GitHub Pages publish logic here
-            url = f"https://api.github.com/repos/{github_username}/{repo}/pages"
-            headers = {
-                "Authorization": f"Bearer {github_token}",
-                "Accept": "application/vnd.github.v3+json"
-            }
-            data = {"source": {"branch": "main"}}
-            response = requests.post(url, json=data, headers=headers)
-            if response.status_code == 201:
-                results.append(f"✅ Successfully published: {repo}")
-            else:
-                results.append(f"❌ Failed to publish: {repo} (Error {response.status_code})")
-        except Exception as e:
-            results.append(f"❌ Error publishing {repo}: {str(e)}")
-    response = "\n".join(results)
-    await bot.send_message(chat_id=chat_id, text=response)
+        results = []
+        for repo in repositories:
+            try:
+                # Perform the GitHub Pages publish logic here
+                url = f"https://api.github.com/repos/{github_username}/{repo}/pages"
+                headers = {
+                    "Authorization": f"Bearer {github_token}",
+                    "Accept": "application/vnd.github.v3+json"
+                }
+                data = {"source": {"branch": "main"}}
+                response = requests.post(url, json=data, headers=headers)
+                if response.status_code == 201:
+                    results.append(f"✅ Successfully published: {repo}")
+                else:
+                    results.append(f"❌ Failed to publish: {repo} (Error {response.status_code})")
+            except Exception as e:
+                results.append(f"❌ Error publishing {repo}: {str(e)}")
+        response = "\n".join(results)
+        await bot.send_message(chat_id=chat_id, text=response)
     elif message_text.lower() == "/unpublish":
-    results = []
-    for repo in repositories:
-        try:
-            # Perform the GitHub Pages unpublish logic here
-            url = f"https://api.github.com/repos/{github_username}/{repo}/pages"
-            headers = {
-                "Authorization": f"Bearer {github_token}",
-                "Accept": "application/vnd.github.v3+json"
-            }
-            response = requests.delete(url, headers=headers)
-            if response.status_code == 204:
-                results.append(f"✅ Successfully unpublished: {repo}")
-            else:
-                results.append(f"❌ Failed to unpublish: {repo} (Error {response.status_code})")
-        except Exception as e:
-            results.append(f"❌ Error unpublishing {repo}: {str(e)}")
-    response = "\n".join(results)
-    await bot.send_message(chat_id=chat_id, text=response)
+        results = []
+        for repo in repositories:
+            try:
+                # Perform the GitHub Pages unpublish logic here
+                url = f"https://api.github.com/repos/{github_username}/{repo}/pages"
+                headers = {
+                    "Authorization": f"Bearer {github_token}",
+                    "Accept": "application/vnd.github.v3+json"
+                }
+                response = requests.delete(url, headers=headers)
+                if response.status_code == 204:
+                    results.append(f"✅ Successfully unpublished: {repo}")
+                else:
+                    results.append(f"❌ Failed to unpublish: {repo} (Error {response.status_code})")
+            except Exception as e:
+                results.append(f"❌ Error unpublishing {repo}: {str(e)}")
+        response = "\n".join(results)
+        await bot.send_message(chat_id=chat_id, text=response)
 
     elif message_text.lower() == "/help":
         response = "Here are the available commands:\n" \
