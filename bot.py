@@ -122,11 +122,12 @@ async def webhook(request: Request):
     # Handle commands
     if message_text.lower() == "/start":
         response = "Welcome to the Leave Management Bot! Use /help to see all available commands."
+    
     elif message_text.lower() == "/publish":
         results = []
         for repo in repositories:
             try:
-                # Perform the GitHub Pages publish logic here
+                # Perform the GitHub Pages publish logic
                 url = f"https://api.github.com/repos/{github_username}/{repo}/pages"
                 headers = {
                     "Authorization": f"Bearer {github_token}",
@@ -140,13 +141,15 @@ async def webhook(request: Request):
                     results.append(f"❌ Failed to publish: {repo} (Error {response.status_code})")
             except Exception as e:
                 results.append(f"❌ Error publishing {repo}: {str(e)}")
-        response = "\n".join(results)
+        # Join results into a single response
+        response = "Publish Status:\n" + "\n".join(results)
         await bot.send_message(chat_id=chat_id, text=response)
+
     elif message_text.lower() == "/unpublish":
         results = []
         for repo in repositories:
             try:
-                # Perform the GitHub Pages unpublish logic here
+                # Perform the GitHub Pages unpublish logic
                 url = f"https://api.github.com/repos/{github_username}/{repo}/pages"
                 headers = {
                     "Authorization": f"Bearer {github_token}",
@@ -159,8 +162,10 @@ async def webhook(request: Request):
                     results.append(f"❌ Failed to unpublish: {repo} (Error {response.status_code})")
             except Exception as e:
                 results.append(f"❌ Error unpublishing {repo}: {str(e)}")
-        response = "\n".join(results)
+        # Join results into a single response
+        response = "Unpublish Status:\n" + "\n".join(results)
         await bot.send_message(chat_id=chat_id, text=response)
+
 
     elif message_text.lower() == "/help":
         response = "Here are the available commands:\n" \
