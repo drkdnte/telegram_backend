@@ -57,7 +57,7 @@ async def webhook(request: Request):
     user_id = update.message.from_user.id
 
     # Restrict access to authorized users only
-    AUTHORIZED_USERS = [123456789, 987654321]  # Replace with actual Telegram user IDs
+    AUTHORIZED_USERS = [8063347077]  # Replace with actual Telegram user IDs
     if user_id not in AUTHORIZED_USERS:
         response = "You are not authorized to use this bot."
         await bot.send_message(chat_id=chat_id, text=response)
