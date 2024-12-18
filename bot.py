@@ -45,8 +45,7 @@ leave_requests_ref = db.reference("leave_requests")
 async def home():
     return {"message": "Telegram Bot is running with Firebase!"}
 
-# List of authorized Telegram user IDs
-AUTHORIZED_USERS = [123456789, 987654321]
+
 
 @app.post("/webhook")  # Ensure this is the correct path
 async def webhook(request: Request):
@@ -54,11 +53,16 @@ async def webhook(request: Request):
     chat_id = update.message.chat.id
     message_text = update.message.text
 
+    # Extract user ID from the update
+    user_id = update.message.from_user.id
+
     # Restrict access to authorized users only
+    AUTHORIZED_USERS = [123456789, 987654321]  # Replace with actual Telegram user IDs
     if user_id not in AUTHORIZED_USERS:
         response = "You are not authorized to use this bot."
         await bot.send_message(chat_id=chat_id, text=response)
         return {"status": "unauthorized"}
+
 
     # Handle commands
     if message_text.lower() == "/start":
