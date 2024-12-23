@@ -49,44 +49,6 @@ cred = credentials.Certificate(firebase_cred)
 
 
 
-def publish_github_pages():
-    """
-    Enable GitHub Pages by updating the repository settings.
-    """
-    url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/pages"
-    headers = {
-        "Authorization": f"Bearer {GITHUB_TOKEN}",
-        "Accept": "application/vnd.github+json",
-    }
-    data = {
-        "source": {
-            "branch": "main",  # Replace with your branch name
-            "path": "/",
-        }
-    }
-    response = requests.post(url, json=data, headers=headers)
-    if response.status_code == 201 or response.status_code == 204:
-        return "GitHub Pages has been published successfully!"
-    else:
-        return f"Failed to publish GitHub Pages. Error: {response.json().get('message', 'Unknown error')}"
-
-
-def unpublish_github_pages():
-    """
-    Disable GitHub Pages by deleting the settings.
-    """
-    url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/pages"
-    headers = {
-        "Authorization": f"Bearer {GITHUB_TOKEN}",
-        "Accept": "application/vnd.github+json",
-    }
-    response = requests.delete(url, headers=headers)
-    if response.status_code == 204:
-        return "GitHub Pages has been unpublished successfully!"
-    else:
-        return f"Failed to unpublish GitHub Pages. Error: {response.json().get('message', 'Unknown error')}"
-
-
 
 # Initialize Firebase App
 initialize_app(cred, {
